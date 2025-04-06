@@ -14,7 +14,7 @@ public class WebConfig {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**") // Apply CORS rules to your API paths
-            .allowedOrigins("http://localhost:8084") // !!! IMPORTANT: Allow your frontend origin
+            .allowedOrigins("http://localhost:8081") // !!! IMPORTANT: Allow your frontend origin
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow necessary HTTP methods
             .allowedHeaders("*") // Allow all headers (including Authorization)
             .allowCredentials(true); // Allow sending credentials (like Basic Auth header)
