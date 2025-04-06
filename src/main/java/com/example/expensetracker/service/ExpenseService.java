@@ -1,13 +1,12 @@
 package com.example.expensetracker.service;
 
+import com.example.expensetracker.dto.ExpenseFilterDTO;
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,7 +29,7 @@ public class ExpenseService {
     public Expense updateExpense(Long id, Expense expense) {
         Expense existing = getExpenseById(id);
         if (existing != null) {
-            existing.setDescription(expense.getDescription());
+            existing.setCategory(expense.getCategory());
             existing.setAmount(expense.getAmount());
             existing.setDate(expense.getDate());
             return expenseRepository.save(existing);
@@ -42,9 +41,21 @@ public class ExpenseService {
         expenseRepository.deleteById(id);
     }
 
-    public Page<Expense> filterExpenses(String description, LocalDate startDate, LocalDate endDate,
-                                        Double minAmount, Double maxAmount, Pageable pageable) {
-        return expenseRepository.filterExpenses(description, startDate, endDate, minAmount, maxAmount, pageable);
+//Good for nested json and more advance filtering
+public Page<Expense> filterExpenses(ExpenseFilterDTO filter, Pageable pageable) {
+    return expenseRepository.filterExpenses(
+            filter.getCategory(),
+            filter.getStartDate(),
+            filter.getEndDate(),
+            filter.getMinAmount(),
+            filter.getMaxAmount(),
+            pageable
+    );
+}
+    //for easier filtering
+    public Page<Expense> filterExpensesByParams(String category, java.time.LocalDate startDate, java.time.LocalDate endDate,
+                                                Double minAmount, Double maxAmount, Pageable pageable) {
+        return expenseRepository.filterExpenses(category, startDate, endDate, minAmount, maxAmount, pageable);
     }
 
 }
