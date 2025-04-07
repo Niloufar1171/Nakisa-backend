@@ -32,7 +32,7 @@ public class ExpenseController {
 
     //Add new end point for filtering the expenses using post for complex queries  1-
     // POST filtering with DTO
-    @PostMapping("/filter")
+    @PostMapping("/filters")
     public Page<Expense> filterExpensesPost(
             @RequestBody ExpenseFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
