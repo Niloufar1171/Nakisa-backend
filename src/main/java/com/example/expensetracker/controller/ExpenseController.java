@@ -61,26 +61,34 @@ public class ExpenseController {
         Pageable pageable = PageRequest.of(page, size);
         return expenseService.filterExpensesByParams(category, startDate, endDate, minAmount, maxAmount, pageable);
     }
+//    @PostMapping
+//    public ResponseEntity<?> createExpense(@Valid @RequestBody Expense expense, BindingResult result) {
+//        if (result.hasErrors()) {
+//            StringBuilder errors = new StringBuilder();
+//            for (FieldError error : result.getFieldErrors()) {
+//                errors.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("\n");
+//            }
+//            return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
+//        }
+//         expenseService.createExpense(expense);
+//        return new ResponseEntity<>(expense,HttpStatus.CREATED);
+//    }
     @PostMapping
-    public ResponseEntity<?> createExpense(@Valid @RequestBody Expense expense, BindingResult result) {
-        if (result.hasErrors()) {
-            StringBuilder errors = new StringBuilder();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("\n");
-            }
-            return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Expense> createExpense(@Valid @RequestBody Expense expense) {
+            return new ResponseEntity<>( expenseService.createExpense(expense), HttpStatus.BAD_REQUEST);
         }
-         expenseService.createExpense(expense);
-        return new ResponseEntity<>(expense,HttpStatus.CREATED);
-    }
-
     @PutMapping("/{id}")
     public Expense updateExpense(@PathVariable Long id, @RequestBody Expense expense) {
         return expenseService.updateExpense(id, expense);
     }
-
+//Change delete to put deleted items in the past month in an archive
     @DeleteMapping("/{id}")
-    public void deleteExpense(@PathVariable Long id) {
-        expenseService.deleteExpense(id);
+    public ResponseEntity<Void> softDeleteExpense(@PathVariable Long id) {
+        expenseService.archiveExpense(id);
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/archived")
+    public List<Expense> getArchived() {
+        return   expenseService.getArchivedExpenses();
     }
 }

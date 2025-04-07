@@ -6,7 +6,10 @@ import com.example.expensetracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -25,7 +28,14 @@ public class ExpenseService {
     public Expense getExpenseById(Long id) {
         return expenseRepository.findById(id).orElse(null);
     }
-
+    public void archiveExpense(Long id) {
+        Expense expense = getExpenseById(id);
+        expense.setDeleted(true);
+        expenseRepository.save(expense);
+    }
+    public List<Expense> getArchivedExpenses() {
+        return expenseRepository.findByDeletedTrue();
+    }
     public Expense updateExpense(Long id, Expense expense) {
         Expense existing = getExpenseById(id);
         if (existing != null) {
@@ -55,24 +65,13 @@ public Page<Expense> filterExpenses(ExpenseFilterDTO filter, Pageable pageable) 
     //for easier filtering
     public Page<Expense> filterExpensesByParams(String category, java.time.LocalDate startDate, java.time.LocalDate endDate,
                                                 Double minAmount, Double maxAmount, Pageable pageable) {
-        if (category == null || category.isEmpty()) {
-            category = null; // If empty, treat it as null
-        }
-        if (minAmount == null) {
-            minAmount = 0.0; // Default min value
-        }
-        if (maxAmount == null) {
-            maxAmount = Double.MAX_VALUE; // No upper limit if maxAmount is null
-        }
-
-        // If start or end date are empty, set them to null
-        if (startDate != null ) {
-            startDate = null;
-        }
-        if (endDate != null) {
-            endDate = null;
-        }
         return expenseRepository.filterExpenses(category, startDate, endDate, minAmount, maxAmount, pageable);
     }
-
+    @Scheduled(cron = "0 0 2 * * ?") // Daily at 2AM
+    public void autoArchiveOldExpenses() {
+        LocalDate cutoff = LocalDate.now().minusDays(30);
+        List<Expense> oldExpenses = expenseRepository.findExpired(cutoff);
+        oldExpenses.forEach(e -> e.setDeleted(true));
+        expenseRepository.saveAll(oldExpenses);
+    }
 }

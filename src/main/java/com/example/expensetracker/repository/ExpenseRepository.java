@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
+import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
@@ -24,4 +25,9 @@ Page<Expense> filterExpenses(@Param("category") String category,
                              @Param("minAmount") Double minAmount,
                              @Param("maxAmount") Double maxAmount,
                              Pageable pageable);
+//Filtering for soft deleting!
+List<Expense> findByDeletedTrue();
+
+    @Query("SELECT e FROM Expense e WHERE e.date < :cutoff AND e.deleted = false")
+    List<Expense> findExpired(@Param("cutoff") LocalDate cutoff);
 }

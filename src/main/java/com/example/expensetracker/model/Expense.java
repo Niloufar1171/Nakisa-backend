@@ -4,7 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
@@ -18,10 +19,11 @@ public class Expense {
 
     private String category;
 
-    @Min(value = 1, message = "Amount must be greater than 0")
+    @NotNull(message = "Amount is required")
+    @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     private Double amount;
 
-
+    @NotNull(message = "Date is required")
     @PastOrPresent(message = "Date cannot be in the future")
     private LocalDate date;
 
@@ -32,6 +34,15 @@ public class Expense {
         this.category= category;
         this.amount = amount;
         this.date = date;
+    }
+    private boolean deleted = false;
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     // Getters and Setters
