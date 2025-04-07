@@ -14,10 +14,11 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 //    List<Expense> findByCategoryAndAmountBetweenAndDateBetween(
 //            String category, Double minAmount, Double maxAmount, String startDate, String endDate);
 @Query("SELECT e FROM Expense e WHERE " +
-        "(e.category = :category OR :category IS NULL) AND " +
-        "(e.amount >= :minAmount OR :minAmount IS NULL) AND " +
-        "(e.amount <= :maxAmount OR :maxAmount IS NULL) AND " +
-        "(e.date BETWEEN :startDate AND :endDate)")
+        "(:category IS NULL OR e.category = :category) AND " +
+        "(:minAmount IS NULL OR e.amount >= :minAmount) AND " +
+        "(:maxAmount IS NULL OR e.amount <= :maxAmount) AND " +
+        "(:startDate IS NULL OR :endDate IS NULL OR e.date BETWEEN :startDate AND :endDate)")
+
 Page<Expense> filterExpenses(@Param("category") String category,
                              @Param("startDate") LocalDate startDate,
                              @Param("endDate") LocalDate endDate,

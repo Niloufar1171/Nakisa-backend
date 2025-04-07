@@ -55,6 +55,23 @@ public Page<Expense> filterExpenses(ExpenseFilterDTO filter, Pageable pageable) 
     //for easier filtering
     public Page<Expense> filterExpensesByParams(String category, java.time.LocalDate startDate, java.time.LocalDate endDate,
                                                 Double minAmount, Double maxAmount, Pageable pageable) {
+        if (category == null || category.isEmpty()) {
+            category = null; // If empty, treat it as null
+        }
+        if (minAmount == null) {
+            minAmount = 0.0; // Default min value
+        }
+        if (maxAmount == null) {
+            maxAmount = Double.MAX_VALUE; // No upper limit if maxAmount is null
+        }
+
+        // If start or end date are empty, set them to null
+        if (startDate != null ) {
+            startDate = null;
+        }
+        if (endDate != null) {
+            endDate = null;
+        }
         return expenseRepository.filterExpenses(category, startDate, endDate, minAmount, maxAmount, pageable);
     }
 
